@@ -2,7 +2,7 @@
 import Stripe from 'stripe';
 import { stripe } from '@/config/stripe';
 import { Tenant, ITenant } from '@/models/Tenant';
-import { TenantType } from '@/constants/billingConstants';
+import { TenantType } from '@/constants/billing.constant';
 
 export interface OnboardTenantDTO {
   name: string;

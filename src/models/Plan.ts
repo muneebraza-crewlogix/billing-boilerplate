@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { PLAN_INTERVALS, PlanInterval } from '@/constants/billingConstants';
+import { PLAN_INTERVALS, PlanInterval } from '@/constants/billing.constant';
 
 export interface IPlan extends Document {
   productId: Types.ObjectId;

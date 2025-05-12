@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { USER_ROLES, UserRole } from '@/constants/billingConstants';
+import { USER_ROLES, UserRole } from '@/constants/billing.constant';
 
 export interface IUser extends Document {
   tenantId: Types.ObjectId;

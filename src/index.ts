@@ -7,11 +7,11 @@ import { connectMongo } from '@/config/mongo';
 import { connectRedis } from '@/config/redis';
 import { swaggerOptions } from '@/config/swagger';
 
-import billingRoutes from '@/routes/billing';
+import billingRoutes from '@/routes/billing.route';
 
-import { errorHandler } from '@/middlewares/errorHandler';
+import { errorHandler } from '@/middlewares/errorHandler.middleware';
 
-import logger from '@/utils/logger';
+import logger from '@/config/logger';
 
 import { config } from '@/config';
 

@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { SUBSCRIPTION_STATUSES, SubscriptionStatus } from '@/constants/billingConstants';
+import { SUBSCRIPTION_STATUSES, SubscriptionStatus } from '@/constants/billing.constant';
 
 export interface IServiceSubscription extends Document {
   tenantId: Types.ObjectId;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { tenantService } from '@/services/tenantService';
+import { tenantService } from '@/services/tenant.service';
 
 export async function onboardTenantHandler(
   req: Request,

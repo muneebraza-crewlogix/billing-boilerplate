@@ -4,7 +4,7 @@ import {
   InvoiceType,
   INVOICE_STATUSES,
   InvoiceStatus,
-} from '@/constants/billingConstants';
+} from '@/constants/billing.constant';
 
 interface LineItem {
   planId: Types.ObjectId;

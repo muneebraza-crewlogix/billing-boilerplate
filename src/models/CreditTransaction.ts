@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { CREDIT_TRANSACTION_TYPES, CreditTransactionType } from '@/constants/billingConstants';
+import { CREDIT_TRANSACTION_TYPES, CreditTransactionType } from '@/constants/billing.constant';
 
 export interface ICreditTransaction extends Document {
   serviceSubscriptionId: Types.ObjectId;

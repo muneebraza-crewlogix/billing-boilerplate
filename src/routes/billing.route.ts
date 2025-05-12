@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { body, param } from 'express-validator';
 
-import { onboardTenantHandler, attachPaymentMethodHandler } from '@/controllers/tenantController';
+import { onboardTenantHandler, attachPaymentMethodHandler } from '@/controllers/tenant.controller';
 
-import { validateRequest } from '@/middlewares/validateRequest';
+import { validateRequest } from '@/middlewares/validateRequest.middleware';
 
-import { TENANT_TYPES } from '@/constants/billingConstants';
+import { TENANT_TYPES } from '@/constants/billing.constant';
 
 const router = Router();
 

@@ -3,7 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 import {
   TENANT_TYPES,
   TenantType
-} from '@/constants/billingConstants';
+} from '@/constants/billing.constant';
 
 export interface ITenant extends Document {
   name: string;
