@@ -20,7 +20,7 @@ export const INVOICE_STATUSES = ['open', 'paid', 'failed', 'void'] as const;
 export type InvoiceStatus = typeof INVOICE_STATUSES[number];
 
 // -- Tenant types --
-export const TENANT_TYPES = ['platform', 'white-label'] as const;
+export const TENANT_TYPES = ['white-label'] as const;
 export type TenantType = typeof TENANT_TYPES[number];
 
 // -- User roles --

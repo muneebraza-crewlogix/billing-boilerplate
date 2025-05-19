@@ -23,7 +23,7 @@ export class TenantService {
 
     // 1️⃣ Create a Stripe Connect account (Express for white-label, Standard otherwise)
     const account = await stripe.accounts.create({
-      type: type === 'white-label' ? 'express' : 'standard',
+      type: 'express',
       email,
       capabilities: {
         card_payments: { requested: true },
