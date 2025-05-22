@@ -9,6 +9,8 @@ import { swaggerOptions } from '@/config/swagger';
 
 import billingRoutes from '@/routes/billing.route';
 
+import webhookRouter from '@/routes/webhook.route';
+
 import { errorHandler } from '@/middlewares/errorHandler.middleware';
 
 import logger from '@/config/logger';
@@ -16,6 +18,8 @@ import logger from '@/config/logger';
 import { config } from '@/config';
 
 const app = express();
+
+app.use('/billing', webhookRouter);
 
 app.use(express.json());
 

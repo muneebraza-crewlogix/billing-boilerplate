@@ -8,32 +8,24 @@ export async function onboardTenantHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { name, type, email, reloadThreshold } = req.body;
-    const tenant = await tenantService.onboardTenant({
-      name,
-      type,
-      email,
-      reloadThreshold,
-    });
+    const { name, email, type, reloadThreshold } = req.body;
 
-    res.status(StatusCodes.CREATED).json(tenant);
+    const result = await tenantService.onboardTenant({ name, email, type, reloadThreshold });
+    // result has both the saved tenant fields and an `onboardingUrl`
+    res.status(StatusCodes.CREATED).json(result);
   } catch (err) {
     next(err);
   }
 }
 
-export async function attachPaymentMethodHandler(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const { tenantId } = req.params;
-    const { email, paymentMethodId } = req.body;
-    const customer = await tenantService.attachPaymentMethod(tenantId, email, paymentMethodId);
+export async function createSetupIntentHandler(req: Request, res: Response) {
+  const { tenantId } = req.params;
+  const clientSecret = await tenantService.createSetupIntent(tenantId);
+  res.json({ clientSecret });
+}
 
-    res.status(StatusCodes.OK).json({ stripeCustomerId: customer.id });
-  } catch (err) {
-    next(err);
-  }
+export async function createPayoutOnboardHandler(req: Request, res: Response) {
+  const { tenantId } = req.params;
+  const url = await tenantService.createPayoutOnboardingLink(tenantId);
+  res.json({ url });
 }

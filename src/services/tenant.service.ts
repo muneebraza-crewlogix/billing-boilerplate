@@ -2,12 +2,14 @@
 import Stripe from 'stripe';
 import { stripe } from '@/config/stripe';
 import { Tenant, ITenant } from '@/models/Tenant';
-import { TenantType } from '@/constants/billing.constant';
+import { TenantType, TenantTypeEnum } from '@/constants/billing.constant';
+import { config } from '@/config';
+import { CreditBalance } from '@/models/CreditBalance';
 
 export interface OnboardTenantDTO {
   name: string;
-  type: TenantType; // 'platform' | 'white-label'
-  email: string; // for Stripe account creation
+  email: string;
+  type: TenantType;
   reloadThreshold?: {
     percent?: number;
     absolute?: number;
@@ -15,31 +17,53 @@ export interface OnboardTenantDTO {
 }
 
 export class TenantService {
-  /**
-   * Creates a new Tenant record *and* a Stripe Connect account.
-   */
   public async onboardTenant(dto: OnboardTenantDTO): Promise<ITenant> {
-    const { name, type, email, reloadThreshold } = dto;
+    const { name, type, reloadThreshold } = dto;
 
-    // 1️⃣ Create a Stripe Connect account (Express for white-label, Standard otherwise)
-    const account = await stripe.accounts.create({
-      type: 'express',
-      email,
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-      },
+    let tenant;
+
+    // ── Phase 1: trial sandbox ───────────────────────────────────
+    if (type === TenantTypeEnum.Trial) {
+      // 1) create only the DB record
+      tenant = new Tenant({ name, type, defaultReloadThreshold: reloadThreshold });
+      await tenant.save();
+
+      // 2) seed some free credits
+      const freebies = [
+        { tenantId: tenant._id, feature: 'super-search', balance: 100 },
+        { tenantId: tenant._id, feature: 'api-credits', balance: 50 },
+      ];
+      await CreditBalance.insertMany(freebies);
+
+      // 3) return the tenant record (no Stripe URL)
+      return tenant.toObject();
+    }
+
+    return tenant!.toObject();
+    // ── Phases 2+3: paid flow (capture card, then Connect onboarding) ─────────────────
+    // (your existing stripe.accounts.create / account link logic goes here)
+    // ...
+  }
+
+  /** Create—or retrieve—your Stripe Customer and issue a SetupIntent */
+  public async createSetupIntent(tenantId: string): Promise<string> {
+    const tenant = await Tenant.findById(tenantId);
+    if (!tenant) throw new Error('Tenant not found');
+
+    // 1) create Stripe Customer only once
+    if (!tenant.stripeCustomerId) {
+      const cus = await stripe.customers.create({ metadata: { tenantId } });
+      tenant.stripeCustomerId = cus.id;
+      await tenant.save();
+    }
+
+    // 2) issue a SetupIntent for off-session card capture
+    const setup = await stripe.setupIntents.create({
+      customer: tenant.stripeCustomerId,
+      usage:    'off_session'
     });
 
-    // 2️⃣ Persist Tenant in MongoDB
-    const tenant = await Tenant.create({
-      name,
-      type,
-      stripeAccountId: account.id,
-      defaultReloadThreshold: reloadThreshold,
-    });
-
-    return tenant;
+    return setup.client_secret!;
   }
 
   /**
@@ -77,6 +101,34 @@ export class TenantService {
     await tenant.save();
 
     return customer;
+  }
+
+  public async createPayoutOnboardingLink(tenantId: string): Promise<string> {
+    const tenant = await Tenant.findById(tenantId);
+    if (!tenant) throw new Error('Tenant not found');
+
+    // 1) Lazy-create Connect account
+    if (!tenant.stripeAccountId) {
+      const acct = await stripe.accounts.create({
+        type:          'express',
+        email:         tenant.email,       // collect on signup or later
+        business_type: 'company',
+        // …any prefilled business_profile / settings…
+      });
+      tenant.stripeAccountId = acct.id;
+      await tenant.save();
+    }
+
+    // 2) Create an AccountLink with only the fields still due
+    const link = await stripe.accountLinks.create({
+      account:     tenant.stripeAccountId,
+      refresh_url: `${config.appUrl}/billing/tenants/${tenantId}/onboard/refresh`,
+      return_url:  `${config.appUrl}/billing/tenants/${tenantId}/onboard/success`,
+      type:        'account_onboarding',
+      collect:     'eventually_due'
+    });
+
+    return link.url!;
   }
 }
 

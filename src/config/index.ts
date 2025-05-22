@@ -12,4 +12,5 @@ export const config = {
     secretKey: process.env.STRIPE_SECRET_KEY!,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
   },
+  appUrl: process.env.APP_URL ?? 'http://localhost:4000',
 };

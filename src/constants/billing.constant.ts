@@ -20,8 +20,18 @@ export const INVOICE_STATUSES = ['open', 'paid', 'failed', 'void'] as const;
 export type InvoiceStatus = typeof INVOICE_STATUSES[number];
 
 // -- Tenant types --
-export const TENANT_TYPES = ['white-label'] as const;
+// -- Tenant types --
+//   • trial: zero-friction sandbox with seeded credits only
+//   • platform: full paid flow (capture card + billing)
+//   • white-label: full paid + custom branding
+export const TENANT_TYPES = ['trial','platform','white-label'] as const;
 export type TenantType = typeof TENANT_TYPES[number];
+
+export enum TenantTypeEnum {
+  Trial = 'trial',
+  Platform = 'platform',
+  WhiteLabel = 'white-label',
+}
 
 // -- User roles --
 export const USER_ROLES = ['admin', 'member'] as const;

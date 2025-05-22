@@ -7,6 +7,7 @@ import {
 
 export interface ITenant extends Document {
   name: string;
+  email: string;
   type: TenantType;
   stripeAccountId?: string;
   stripeCustomerId?: string;
@@ -21,6 +22,7 @@ export interface ITenant extends Document {
 const TenantSchema = new Schema<ITenant>(
   {
     name: { type: String, required: true },
+    email: { type: String, required: false },
     type: {
       type: String,
       enum: TENANT_TYPES,
